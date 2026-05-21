@@ -1,0 +1,16 @@
+# Dependencies (both client and server)
+node_modules/
+
+# Environment variables — never commit these
+.env
+.env.local
+
+# React build output
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Vite cache
+.vite/
