@@ -14,7 +14,7 @@ const useAuthStore = create((set) => ({
   loadFromStorage: () => {
     const token = localStorage.getItem("token");
     if (token) {
-      set({ user: { name: "Dummy Name" }, token });
+      set({ user: set.data.user, token });
     }
   },
 }));
