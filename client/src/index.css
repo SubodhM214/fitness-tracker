@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+.react-calendar-heatmap .color-empty {
+  fill: #f3f4f6;
+}
+.react-calendar-heatmap .color-scale-1 {
+  fill: #c4b5fd;
+}
+.react-calendar-heatmap .color-scale-2 {
+  fill: #8b5cf6;
+}
+.react-calendar-heatmap .color-scale-3 {
+  fill: #5b21b6;
+}
+.react-calendar-heatmap text {
+  font-size: 6px;
+  fill: #9ca3af;
+}
