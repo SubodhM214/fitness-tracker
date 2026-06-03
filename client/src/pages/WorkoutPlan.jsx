@@ -17,19 +17,23 @@ const MUSCLES = [
 ];
 
 const MUSCLE_COLORS = {
-  chest: "bg-blue-50 text-blue-700 border-blue-100",
-  back: "bg-green-50 text-green-700 border-green-100",
-  biceps: "bg-purple-50 text-purple-700 border-purple-100",
-  triceps: "bg-orange-50 text-orange-700 border-orange-100",
-  shoulders: "bg-yellow-50 text-yellow-700 border-yellow-100",
-  legs: "bg-teal-50 text-teal-700 border-teal-100",
-  abs: "bg-pink-50 text-pink-700 border-pink-100",
+  chest: "bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200",
+  back: "bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-200",
+  biceps:
+    "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200",
+  triceps:
+    "bg-orange-50 text-orange-700 dark:bg-orange-900 dark:text-orange-200",
+  shoulders:
+    "bg-yellow-50 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200",
+  legs: "bg-teal-50 text-teal-700 dark:bg-teal-900 dark:text-teal-200",
+  abs: "bg-pink-50 text-pink-700 dark:bg-pink-900 dark:text-pink-200",
 };
 
 const DIFF_COLORS = {
-  beginner: "bg-green-50 text-green-600",
-  intermediate: "bg-yellow-50 text-yellow-600",
-  advanced: "bg-red-50 text-red-600",
+  beginner: "bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-300",
+  intermediate:
+    "bg-yellow-50 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-300",
+  advanced: "bg-red-50 text-red-600 dark:bg-red-900 dark:text-red-300",
 };
 
 const DEFAULT_SETS = 3;
@@ -53,9 +57,6 @@ function WorkoutPlan() {
   const [starting, setStarting] = useState(false);
   const [timerSecs, setTimerSecs] = useState(90);
   const [timerRunning, setTimerRunning] = useState(false);
-
-  // two view modes: "build" = building plan, "active" = workout in progress
-  // "active" mode is shown regardless of which muscle tab is selected
   const [viewMode, setViewMode] = useState("build");
 
   useEffect(() => {
@@ -101,16 +102,13 @@ function WorkoutPlan() {
       const res = await getTodayLog();
       if (res.data) {
         setTodayLog(res.data);
-        setViewMode("active"); // already has a workout today — go to active view
+        setViewMode("active");
       }
-    } catch (err) {
-      // no log today
-    }
+    } catch (err) {}
   };
 
   const addToPlan = (exercise) => {
-    const alreadyAdded = selectedPlan.find((e) => e._id === exercise._id);
-    if (alreadyAdded) {
+    if (selectedPlan.find((e) => e._id === exercise._id)) {
       toast("Already in your plan", { icon: "👀" });
       return;
     }
@@ -133,25 +131,21 @@ function WorkoutPlan() {
     toast.success(`${exercise.name} added!`);
   };
 
-  const removeFromPlan = (id) => {
+  const removeFromPlan = (id) =>
     setSelectedPlan((prev) => prev.filter((e) => e._id !== id));
-  };
 
-  const updatePlanExercise = (id, field, value) => {
+  const updatePlanExercise = (id, field, value) =>
     setSelectedPlan((prev) =>
       prev.map((e) => (e._id === id ? { ...e, [field]: value } : e)),
     );
-  };
 
   const handleStartWorkout = async () => {
     if (selectedPlan.length === 0) {
       toast.error("Add at least one exercise to your plan");
       return;
     }
-
     const muscleGroups = [...new Set(selectedPlan.map((e) => e.muscleGroup))];
     const muscleLabel = muscleGroups.join(" + ");
-
     setStarting(true);
     try {
       const res = await startWorkout({
@@ -167,7 +161,7 @@ function WorkoutPlan() {
       });
       setTodayLog(res.data);
       setSelectedPlan([]);
-      setViewMode("active"); // switch to active workout view
+      setViewMode("active");
       toast.success("Workout started! Let's go 🔥");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to start workout");
@@ -181,9 +175,8 @@ function WorkoutPlan() {
     try {
       const res = await completeExercise({ exerciseId, completed });
       setTodayLog(res.data);
-      if (res.data.isComplete) {
+      if (res.data.isComplete)
         toast.success("Workout complete! Streak updated 🎉");
-      }
     } catch (err) {
       updateExerciseInLog(exerciseId, !completed);
       toast.error("Failed to update");
@@ -201,30 +194,30 @@ function WorkoutPlan() {
       ? allExercises
       : allExercises.filter((e) => e.workoutType === activeType);
 
-  // unique muscle groups already in the plan — for display
   const planMuscles = [...new Set(selectedPlan.map((e) => e.muscleGroup))];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       <Toaster position="top-center" />
 
       {/* topbar */}
-      <div className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-10">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-3 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <h1 className="font-semibold text-gray-900">Workout plan</h1>
+          <h1 className="font-semibold text-gray-900 dark:text-white">
+            Workout plan
+          </h1>
           <div className="flex items-center gap-2">
-            {/* toggle between build and active view if both exist */}
             {todayLog && (
               <button
                 onClick={() =>
                   setViewMode((v) => (v === "active" ? "build" : "active"))
                 }
-                className="text-xs text-purple-600 bg-purple-50 px-3 py-1 rounded-full"
+                className="text-xs text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900 px-3 py-1 rounded-full"
               >
                 {viewMode === "active" ? "＋ Add more" : "↩ My workout"}
               </button>
             )}
-            <span className="text-xs text-gray-400 capitalize bg-gray-100 px-2 py-1 rounded-full">
+            <span className="text-xs text-gray-400 dark:text-gray-500 capitalize bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
               {user?.experienceLevel || "beginner"}
             </span>
           </div>
@@ -236,11 +229,13 @@ function WorkoutPlan() {
         {viewMode === "active" && todayLog ? (
           <>
             {/* rest timer */}
-            <div className="bg-purple-50 rounded-2xl p-3 flex items-center justify-between">
+            <div className="bg-purple-50 dark:bg-purple-950 rounded-2xl p-3 flex items-center justify-between">
               <div>
-                <div className="text-xs text-purple-500 mb-0.5">Rest timer</div>
+                <div className="text-xs text-purple-500 dark:text-purple-400 mb-0.5">
+                  Rest timer
+                </div>
                 <div
-                  className={`text-2xl font-bold tabular-nums ${timerSecs <= 10 ? "text-red-500" : "text-purple-900"}`}
+                  className={`text-2xl font-bold tabular-nums ${timerSecs <= 10 ? "text-red-500" : "text-purple-900 dark:text-purple-100"}`}
                 >
                   {formatTimer()}
                 </div>
@@ -248,7 +243,7 @@ function WorkoutPlan() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setTimerRunning((r) => !r)}
-                  className="px-3 py-1.5 rounded-xl border border-purple-200 text-purple-700 text-sm bg-white"
+                  className="px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-sm bg-white dark:bg-gray-800"
                 >
                   {timerRunning ? "⏸ Pause" : "▶ Start"}
                 </button>
@@ -257,17 +252,18 @@ function WorkoutPlan() {
                     setTimerRunning(false);
                     setTimerSecs(90);
                   }}
-                  className="px-3 py-1.5 rounded-xl border border-gray-200 text-gray-500 text-sm bg-white"
+                  className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-sm bg-white dark:bg-gray-800"
                 >
                   ↺
                 </button>
               </div>
             </div>
 
-            {/* session label — shows all muscles */}
+            {/* session label */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-gray-400">Today:</span>
-              {/* show muscleLabel if available, else muscleGroup */}
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                Today:
+              </span>
               {(todayLog.muscleLabel || todayLog.muscleGroup)
                 .split(" + ")
                 .map((mg) => (
@@ -278,32 +274,27 @@ function WorkoutPlan() {
                     {mg}
                   </span>
                 ))}
-              <span className="text-xs text-gray-400 ml-auto">
+              <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
                 {todayLog.totalCompleted}/{todayLog.exercises.length} done
               </span>
             </div>
 
             {/* progress bar */}
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-purple-600 rounded-full transition-all duration-500"
                 style={{
-                  width: `${
-                    todayLog.exercises.length > 0
-                      ? (todayLog.totalCompleted / todayLog.exercises.length) *
-                        100
-                      : 0
-                  }%`,
+                  width: `${todayLog.exercises.length > 0 ? (todayLog.totalCompleted / todayLog.exercises.length) * 100 : 0}%`,
                 }}
               />
             </div>
 
             {/* exercise list */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4">
               {todayLog.exercises.map((ex) => (
                 <div
                   key={ex._id}
-                  className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0"
+                  className="flex items-center gap-3 py-3 border-b border-gray-50 dark:border-gray-700 last:border-0"
                 >
                   <button
                     onClick={() =>
@@ -313,17 +304,16 @@ function WorkoutPlan() {
                       ${
                         ex.completed
                           ? "bg-green-500 border-green-500 text-white"
-                          : "border-gray-300 hover:border-purple-400"
+                          : "border-gray-300 dark:border-gray-500 hover:border-purple-400"
                       }`}
                   >
                     {ex.completed && (
                       <span className="text-xs font-bold">✓</span>
                     )}
                   </button>
-
                   <div className="flex-1 min-w-0">
                     <div
-                      className={`text-sm font-medium ${ex.completed ? "text-gray-400 line-through" : "text-gray-800"}`}
+                      className={`text-sm font-medium ${ex.completed ? "text-gray-400 line-through" : "text-gray-800 dark:text-gray-100"}`}
                     >
                       {ex.name}
                     </div>
@@ -335,12 +325,11 @@ function WorkoutPlan() {
                           {ex.muscleGroup}
                         </span>
                       )}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         {ex.sets} sets × {ex.reps} reps
                       </span>
                     </div>
                   </div>
-
                   <div
                     className={`text-xs font-semibold px-2 py-1 rounded-xl flex-shrink-0 ${MUSCLE_COLORS[ex.muscleGroup] || "bg-gray-100 text-gray-500"}`}
                   >
@@ -350,12 +339,12 @@ function WorkoutPlan() {
               ))}
 
               {todayLog.isComplete && (
-                <div className="mt-4 text-center bg-green-50 rounded-xl p-4">
+                <div className="mt-4 text-center bg-green-50 dark:bg-green-900 rounded-xl p-4">
                   <div className="text-2xl mb-1">🎉</div>
-                  <div className="text-sm font-semibold text-green-700">
+                  <div className="text-sm font-semibold text-green-700 dark:text-green-300">
                     Workout complete!
                   </div>
-                  <div className="text-xs text-green-500 mt-0.5">
+                  <div className="text-xs text-green-500 dark:text-green-400 mt-0.5">
                     Streak updated
                   </div>
                 </div>
@@ -366,7 +355,7 @@ function WorkoutPlan() {
           <>
             {/* ── BUILD PLAN VIEW ── */}
 
-            {/* muscle tabs — shown in build mode so you can browse different muscles */}
+            {/* muscle tabs */}
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {MUSCLES.map((muscle) => (
                 <button
@@ -375,8 +364,8 @@ function WorkoutPlan() {
                   className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm capitalize font-medium transition-all
                     ${
                       activeMuscle === muscle
-                        ? "bg-purple-600 text-white shadow-sm"
-                        : "bg-white text-gray-500 border border-gray-200"
+                        ? "bg-purple-600 text-white"
+                        : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600"
                     }`}
                 >
                   {muscle}
@@ -384,25 +373,24 @@ function WorkoutPlan() {
               ))}
             </div>
 
-            {/* my plan — persists across muscle tab switches */}
+            {/* selected plan */}
             {selectedPlan.length > 0 && (
-              <div className="bg-white rounded-2xl border border-purple-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-purple-800 p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <h2 className="text-sm font-semibold text-gray-700">
+                  <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                     My plan
-                    <span className="ml-2 text-xs font-normal text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+                    <span className="ml-2 text-xs font-normal text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900 px-2 py-0.5 rounded-full">
                       {selectedPlan.length} exercises
                     </span>
                   </h2>
                   <button
                     onClick={() => setSelectedPlan([])}
-                    className="text-xs text-red-400 hover:text-red-600"
+                    className="text-xs text-red-400"
                   >
                     Clear all
                   </button>
                 </div>
 
-                {/* muscle group tags in plan */}
                 <div className="flex gap-1.5 mb-3 flex-wrap">
                   {planMuscles.map((mg) => (
                     <span
@@ -417,11 +405,11 @@ function WorkoutPlan() {
                 {selectedPlan.map((ex) => (
                   <div
                     key={ex._id}
-                    className="py-3 border-b border-gray-50 last:border-0"
+                    className="py-3 border-b border-gray-50 dark:border-gray-700 last:border-0"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <div className="text-sm font-medium text-gray-800">
+                        <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
                           {ex.name}
                         </div>
                         <span
@@ -432,17 +420,18 @@ function WorkoutPlan() {
                       </div>
                       <button
                         onClick={() => removeFromPlan(ex._id)}
-                        className="text-xs text-red-400 hover:text-red-600 ml-2"
+                        className="text-xs text-red-400 ml-2"
                       >
                         ✕
                       </button>
                     </div>
 
-                    {/* sets and reps controls */}
                     <div className="flex items-center gap-3 flex-wrap">
-                      {/* sets stepper */}
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5">
-                        <span className="text-xs text-gray-400">Sets</span>
+                      {/* sets */}
+                      <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-xl px-3 py-1.5">
+                        <span className="text-xs text-gray-400 dark:text-gray-400">
+                          Sets
+                        </span>
                         <button
                           onClick={() =>
                             updatePlanExercise(
@@ -451,11 +440,11 @@ function WorkoutPlan() {
                               Math.max(1, ex.customSets - 1),
                             )
                           }
-                          className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-xs flex items-center justify-center hover:bg-purple-100 hover:text-purple-700"
+                          className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center"
                         >
                           −
                         </button>
-                        <span className="text-sm font-semibold text-gray-800 w-4 text-center">
+                        <span className="text-sm font-semibold text-gray-800 dark:text-white w-4 text-center">
                           {ex.customSets}
                         </span>
                         <button
@@ -466,14 +455,14 @@ function WorkoutPlan() {
                               Math.min(10, ex.customSets + 1),
                             )
                           }
-                          className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-xs flex items-center justify-center hover:bg-purple-100 hover:text-purple-700"
+                          className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 text-xs flex items-center justify-center"
                         >
                           +
                         </button>
                       </div>
 
-                      {/* reps input */}
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-1.5">
+                      {/* reps */}
+                      <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-xl px-3 py-1.5">
                         <span className="text-xs text-gray-400">Reps</span>
                         <input
                           type="text"
@@ -485,7 +474,7 @@ function WorkoutPlan() {
                               e.target.value,
                             )
                           }
-                          className="w-14 text-sm font-semibold text-gray-800 bg-transparent focus:outline-none text-center border-b border-gray-300 focus:border-purple-400"
+                          className="w-14 text-sm font-semibold text-gray-800 dark:text-white bg-transparent focus:outline-none text-center border-b border-gray-300 dark:border-gray-500 focus:border-purple-400"
                           placeholder="10"
                         />
                       </div>
@@ -502,7 +491,7 @@ function WorkoutPlan() {
                 <button
                   onClick={handleStartWorkout}
                   disabled={starting}
-                  className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl text-sm transition-colors disabled:opacity-60"
+                  className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl text-sm disabled:opacity-60"
                 >
                   {starting
                     ? "Starting..."
@@ -520,8 +509,8 @@ function WorkoutPlan() {
                   className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-all
                     ${
                       activeType === type
-                        ? "bg-gray-800 text-white"
-                        : "bg-white text-gray-400 border border-gray-200"
+                        ? "bg-gray-800 dark:bg-white text-white dark:text-gray-900"
+                        : "bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 border border-gray-200 dark:border-gray-600"
                     }`}
                 >
                   {type}
@@ -530,9 +519,9 @@ function WorkoutPlan() {
             </div>
 
             {/* exercise browser */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-gray-700 capitalize">
+                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 capitalize">
                   {activeMuscle} exercises
                 </h2>
                 <span
@@ -552,16 +541,16 @@ function WorkoutPlan() {
                   return (
                     <div
                       key={ex._id}
-                      className="py-3 border-b border-gray-50 last:border-0"
+                      className="py-3 border-b border-gray-50 dark:border-gray-700 last:border-0"
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base ${MUSCLE_COLORS[activeMuscle]}`}
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${MUSCLE_COLORS[activeMuscle]}`}
                         >
                           💪
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-800">
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
                             {ex.name}
                           </div>
                           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
@@ -570,33 +559,31 @@ function WorkoutPlan() {
                             >
                               {ex.difficulty}
                             </span>
-                            <span className="text-[10px] text-gray-400">
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500">
                               {ex.workoutType}
                             </span>
-                            <span className="text-[10px] text-gray-400">
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500">
                               · {ex.equipment}
                             </span>
                           </div>
-                          <div className="text-[10px] text-gray-400 mt-0.5">
+                          <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
                             Suggested: {ex.sets} sets × {ex.reps} reps
                           </div>
                         </div>
-
                         <button
                           onClick={() => addToPlan(ex)}
                           className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-lg transition-all
                             ${
                               inPlan
-                                ? "bg-green-100 text-green-600"
-                                : "bg-purple-100 text-purple-600 hover:bg-purple-200"
+                                ? "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300"
+                                : "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200"
                             }`}
                         >
                           {inPlan ? "✓" : "+"}
                         </button>
                       </div>
-
                       {ex.instructions && (
-                        <div className="mt-2 ml-12 text-[11px] text-gray-400 leading-relaxed">
+                        <div className="mt-2 ml-12 text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
                           💡 {ex.instructions}
                         </div>
                       )}
@@ -607,7 +594,7 @@ function WorkoutPlan() {
             </div>
 
             {selectedPlan.length === 0 && !loading && (
-              <div className="text-center text-xs text-gray-400 py-2">
+              <div className="text-center text-xs text-gray-400 dark:text-gray-500 py-2">
                 Tap <span className="font-semibold text-purple-500">+</span> on
                 any exercise to build your plan
               </div>

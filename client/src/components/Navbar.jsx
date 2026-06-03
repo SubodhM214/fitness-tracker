@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-
+import useThemeStore from "../store/themeStore";
 const tabs = [
   { to: "/dashboard", label: "Dashboard", icon: "⊞" },
   { to: "/workout", label: "Workout", icon: "🏋" },
@@ -8,6 +8,7 @@ const tabs = [
 ];
 
 function Navbar() {
+  const { isDark, toggleTheme } = useThemeStore();
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex z-50">
       {tabs.map((tab) => (
@@ -23,6 +24,14 @@ function Navbar() {
           <span>{tab.label}</span>
         </NavLink>
       ))}
+      <button
+        onClick={toggleTheme}
+        className="flex flex-col items-center justify-center py-3 px-3 gap-1 text-xs text-gray-400 dark:text-gray-500"
+        aria-label="Toggle dark mode"
+      >
+        <span className="text-xl leading-none">{isDark ? "☀️" : "🌙"}</span>
+        <span>{isDark ? "Light" : "Dark"}</span>
+      </button>
     </nav>
   );
 }
