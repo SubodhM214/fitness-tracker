@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
-import useAuthStore from "./store/authStore";
 import useThemeStore from "./store/themeStore";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -11,10 +11,10 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
   const initTheme = useThemeStore((state) => state.initTheme);
+
   useEffect(() => {
-    (loadFromStorage(), initTheme());
+    initTheme();
   }, []);
 
   return (
