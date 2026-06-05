@@ -10,13 +10,11 @@ import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-
 function App() {
   const loadFromStorage = useAuthStore((state) => state.loadFromStorage);
-  const initTheme=useThemeStore((state) => state.initTheme);
+  const initTheme = useThemeStore((state) => state.initTheme);
   useEffect(() => {
-    loadFromStorage(),
-    initTheme();
+    (loadFromStorage(), initTheme());
   }, []);
 
   return (
