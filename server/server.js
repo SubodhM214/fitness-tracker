@@ -11,7 +11,16 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // local dev
+      "https://your-app.vercel.app", // production (update after Vercel deploy)
+      /\.vercel\.app$/, // any vercel preview URL
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
