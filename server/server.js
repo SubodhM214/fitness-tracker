@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", // local dev
-      "https://fittrack.vercel.app", // production (update after Vercel deploy)
+      process.env.ALLOWED_ORIGIN, // production (update after Vercel deploy)
       /\.vercel\.app$/, // any vercel preview URL
     ],
     credentials: true,
